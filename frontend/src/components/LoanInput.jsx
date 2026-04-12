@@ -2,6 +2,7 @@ import { useState } from "react";
 import InputSection from "./InputSection";
 import Loader from "./Loader";
 import ResultSection from "./ResultSection";
+import { API_URL } from "../config";
 
 function LoanInput({ result, onResult }) {
   const [loanText, setLoanText] = useState("");
@@ -19,12 +20,12 @@ function LoanInput({ result, onResult }) {
         const formData = new FormData();
         formData.append("file", file);
 
-        res = await fetch("http://localhost:4000/upload-pdf", {
+        res = await fetch(`${API_URL}/api/upload-pdf`, {
           method: "POST",
           body: formData,
         });
       } else {
-        res = await fetch("http://localhost:4000/analyze-loan", {
+        res = await fetch(`${API_URL}/api/analyze-loan`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
