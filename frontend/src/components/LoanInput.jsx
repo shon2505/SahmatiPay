@@ -34,6 +34,18 @@ function LoanInput({ result, onResult }) {
         });
       }
 
+      const contentType = res.headers.get("content-type") || "";
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(errorText || `Request failed with status ${res.status}`);
+      }
+
+      if (!contentType.includes("application/json")) {
+        const errorText = await res.text();
+        throw new Error(errorText || "Server returned a non-JSON response.");
+      }
+
       const data = await res.json();
       if (onResult) onResult(data);
     } catch (err) {

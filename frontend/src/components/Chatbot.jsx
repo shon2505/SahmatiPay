@@ -37,6 +37,18 @@ function Chatbot() {
         body: JSON.stringify({ question: nextQuestion }),
       });
 
+      const contentType = response.headers.get("content-type") || "";
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || `Request failed with status ${response.status}`);
+      }
+
+      if (!contentType.includes("application/json")) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Server returned a non-JSON response.");
+      }
+
       const data = await response.json();
 
       setMessages((current) => [
@@ -52,7 +64,7 @@ function Chatbot() {
         ...current,
         {
           role: "assistant",
-          content: "I am unable to connect right now. Please check that the backend server is running.",
+          content: "I am unable to connect right now. Please check that the backend URL and deployed routes are correct.",
         },
       ]);
     } finally {

@@ -12,6 +12,7 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
+app.use("/api", loanRoutes);
 app.use("/", loanRoutes);
 
 app.get("/", (req, res) => {
