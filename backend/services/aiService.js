@@ -24,6 +24,98 @@ const PARAMETERS = [
   "loan type"
 ];
 
+const extractJsonCandidate = (value) => {
+  if (!value) return "";
+
+  const fencedMatch = value.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  const source = fencedMatch ? fencedMatch[1] : value;
+  const start = source.indexOf("{");
+
+  if (start === -1) {
+    return source.trim();
+  }
+
+  let inString = false;
+  let isEscaped = false;
+  let depth = 0;
+
+  for (let index = start; index < source.length; index += 1) {
+    const char = source[index];
+
+    if (isEscaped) {
+      isEscaped = false;
+      continue;
+    }
+
+    if (char === "\\") {
+      isEscaped = true;
+      continue;
+    }
+
+    if (char === '"') {
+      inString = !inString;
+      continue;
+    }
+
+    if (inString) {
+      continue;
+    }
+
+    if (char === "{") {
+      depth += 1;
+    } else if (char === "}") {
+      depth -= 1;
+
+      if (depth === 0) {
+        return source.slice(start, index + 1).trim();
+      }
+    }
+  }
+
+  return source.slice(start).trim();
+};
+
+const tryParseJson = (value) => {
+  const attempts = [
+    value,
+    value.replace(/,\s*([}\]])/g, "$1"),
+    value
+      .replace(/[“”]/g, '"')
+      .replace(/[‘’]/g, "'")
+      .replace(/,\s*([}\]])/g, "$1"),
+  ];
+
+  for (const attempt of attempts) {
+    try {
+      return JSON.parse(attempt);
+    } catch (error) {
+      // Continue through cleanup attempts.
+    }
+  }
+
+  return null;
+};
+
+const repairJsonWithModel = async (brokenJson) => {
+  const response = await client.chat.completions.create({
+    model: "llama-3.1-8b-instant",
+    messages: [
+      {
+        role: "system",
+        content: "You repair malformed JSON. Return only valid JSON with the same data and no extra text.",
+      },
+      {
+        role: "user",
+        content: brokenJson,
+      },
+    ],
+    response_format: { type: "json_object" },
+    temperature: 0,
+  });
+
+  return JSON.parse(response.choices[0].message.content);
+};
+
 const analyzeLoanText = async (text) => {
   // ✅ FIX: clean text inside function
   const cleanText = text.replace(/\n/g, " ");
@@ -62,19 +154,27 @@ ${cleanText}
   const response = await client.chat.completions.create({
     model: "llama-3.1-8b-instant",
     messages: [{ role: "user", content: prompt }],
+    response_format: { type: "json_object" },
+    temperature: 0,
   });
 
   const output = response.choices[0].message.content;
 
   console.log("GROQ OUTPUT:\n", output);
 
-  const jsonMatch = output.match(/\{[\s\S]*\}/);
+  const jsonCandidate = extractJsonCandidate(output);
 
-  if (!jsonMatch) {
+  if (!jsonCandidate) {
     throw new Error("No JSON found");
   }
 
-  return JSON.parse(jsonMatch[0]);
+  const parsed = tryParseJson(jsonCandidate);
+
+  if (parsed) {
+    return parsed;
+  }
+
+  return repairJsonWithModel(jsonCandidate);
 };
 
 const FINANCIAL_CHAT_KEYWORDS = [
