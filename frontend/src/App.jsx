@@ -17,20 +17,20 @@ function App() {
     <div className="min-h-screen bg-slate-50 text-slate-900">
       <Navbar />
 
-      <main>
+      <main className="relative">
         <section id="home" className="scroll-mt-24">
           <Hero />
         </section>
 
-        <section id="analyze" className="scroll-mt-24">
+        <section id="analyze" className="scroll-mt-24 bg-white">
           <LoanInput result={analysisResult} onResult={setAnalysisResult} />
         </section>
 
-        <section id="risk" className="scroll-mt-24 bg-white">
+        <section id="risk" className="scroll-mt-24 border-y border-slate-200/70 bg-slate-50/70">
           <RiskPanel risks={analysisResult?.risks} hasAnalysis={Boolean(analysisResult)} />
         </section>
 
-        <section id="features" className="scroll-mt-24">
+        <section id="features" className="scroll-mt-24 bg-white">
           <FeatureHighlights />
         </section>
 

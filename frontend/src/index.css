@@ -5,14 +5,33 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --color-bg: #f7fafc;
+    --color-surface: #ffffff;
+    --color-text: #0f172a;
+    --color-muted: #475569;
+    --color-border: #e2e8f0;
+    --color-primary: #2563eb;
+    --color-primary-soft: #eff6ff;
+  }
+}
+
+@layer base {
   html {
     scroll-behavior: smooth;
   }
 
   body {
     font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
-    background-color: #f8fafc;
-    color: #0f172a;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    line-height: 1.6;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  section {
+    position: relative;
   }
 }
 
@@ -23,6 +42,14 @@
 
   .animate-score-pop {
     animation: score-pop 0.35s ease-out both;
+  }
+
+  .animate-fade-down {
+    animation: fade-down 0.35s ease-out both;
+  }
+
+  .scan-line {
+    animation: scan-move 2.8s ease-in-out infinite;
   }
 
   @keyframes fade-up {
@@ -44,6 +71,41 @@
     to {
       opacity: 1;
       transform: scale(1);
+    }
+  }
+
+  @keyframes fade-down {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes scan-move {
+    0% {
+      transform: translateY(0);
+      opacity: 0.4;
+    }
+    50% {
+      transform: translateY(164px);
+      opacity: 0.9;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 0.4;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-fade-up,
+    .animate-fade-down,
+    .animate-score-pop,
+    .scan-line {
+      animation: none !important;
     }
   }
 }

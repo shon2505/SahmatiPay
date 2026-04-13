@@ -61,31 +61,23 @@ function TextToSpeech() {
   }
 
   return (
-    <div className="fixed bottom-5 left-5 z-50 w-[calc(100vw-2.5rem)] max-w-xs rounded-lg border border-slate-200 bg-white p-3 shadow-xl shadow-slate-300/60">
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-wide text-blue-700">Text to speech</p>
-          <p className="mt-1 text-xs text-slate-500">
-            {selectedText ? "Selected text ready" : "Select text to hear it"}
-          </p>
-        </div>
-
-        {isSpeaking && (
-          <button
-            type="button"
-            onClick={stop}
-            className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-black text-red-700 transition hover:bg-red-100"
-          >
-            Stop
-          </button>
-        )}
+    <div className="fixed bottom-4 left-4 z-50 w-[calc(100vw-2rem)] max-w-[260px] rounded-2xl border border-slate-200/90 bg-white/95 p-2.5 shadow-lg shadow-slate-300/40 backdrop-blur">
+      <div className="mb-2 flex items-center justify-between">
+        <p className="text-[11px] font-bold uppercase tracking-wide text-blue-700">Read Selected</p>
+        <span
+          className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+            selectedText ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-500"
+          }`}
+        >
+          {selectedText ? "Ready" : "Select Text"}
+        </span>
       </div>
 
-      <div className="mt-3 flex gap-2">
+      <div className="flex gap-1.5">
         <select
           value={language}
           onChange={(event) => setLanguage(event.target.value)}
-          className="min-w-0 flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+          className="min-w-0 flex-1 rounded-lg border border-slate-200 bg-white px-2 py-2 text-xs font-bold text-slate-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
           aria-label="Text to speech language"
         >
           <option value="auto">Auto</option>
@@ -97,9 +89,19 @@ function TextToSpeech() {
           type="button"
           onClick={speak}
           disabled={!selectedText || isSpeaking}
-          className="rounded-lg bg-emerald-600 px-4 py-2 text-xs font-black text-white shadow-sm transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+          className="rounded-lg bg-emerald-600 px-3 py-2 text-xs font-black text-white shadow-sm transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-slate-300"
         >
-          Speak
+          Listen
+        </button>
+
+        <button
+          type="button"
+          onClick={stop}
+          disabled={!isSpeaking}
+          className="rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-xs font-bold text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:text-slate-300"
+          aria-label="Stop reading"
+        >
+          Stop
         </button>
       </div>
     </div>
